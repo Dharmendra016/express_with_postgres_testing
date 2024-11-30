@@ -11,8 +11,7 @@ const userModel = `
 
 const userInput = `
     INSERT INTO COLLEGE( name , email , password)
-    VALUES ($1,$2,$3)
-    RETURNING *;
+    VALUES ($1,$2,$3);
 `
 
 const initializeUserTable = async () => {

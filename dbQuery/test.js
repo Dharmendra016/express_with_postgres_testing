@@ -49,3 +49,38 @@ module.exports.getAllUser = async (req , res) => {
         console.log(error.message);
     }
 }
+
+module.exports.loginUser = async (req , res) => {
+
+    try {
+        const {email , password} = req.body ;
+
+        if(!email || !password){
+            return res.status(400).json({
+                success:false,
+                message:"no details entered",
+            })
+        }
+
+        const query = `
+        SELECT * FROM COLLEGE
+        WHERE email = $1 AND password = $2
+        `
+        const response = await client.query(query , [email , password]);
+
+        if(response.rows.length === 0){
+            return res.status(400).json({
+                success:false,
+                message:"no user found",
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"successfully login",
+            user:response.rows
+        })
+    } catch (error) {
+        console.log(error.message);
+    }
+
+}
