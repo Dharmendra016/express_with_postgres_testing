@@ -1,7 +1,8 @@
+const e = require("express");
 const { initializeUserTable, insertUser } = require("../models/user.model");
 const { client } = require("../utils/pgconnect")
 
-
+//create
 module.exports.createUser = async (req, res )=>{
     try {
         const {name , email , password} = req.body ;
@@ -33,6 +34,7 @@ module.exports.createUser = async (req, res )=>{
     }
 }
 
+//read
 module.exports.getAllUser = async (req , res) => {
     try {
         const query = `
@@ -50,6 +52,7 @@ module.exports.getAllUser = async (req , res) => {
     }
 }
 
+//login
 module.exports.loginUser = async (req , res) => {
 
     try {
@@ -83,4 +86,77 @@ module.exports.loginUser = async (req , res) => {
         console.log(error.message);
     }
 
+}
+//delete
+module.exports.deleteUser = async (req , res) => {
+    try {
+        
+        const name = req.params.name ;
+        
+        if(!name){
+            return res.status(400).json({
+                success:false,
+                message:"no details entered",
+            })
+        }
+
+        const query = `
+        DELETE FROM COLLEGE
+        WHERE name = $1
+        `
+
+        const response = await client.query(query , [name]);
+
+        if(response.rowCount === 0){
+            return res.status(400).json({
+                success:false,
+                message:"no user found",    
+            })  
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"successfully delete the user",
+        })
+
+
+    } catch (error) {
+        console.log(error.message);
+        
+    }
+}
+
+//update
+module.exports.updateUser = async (req , res) => {
+    try {
+        const {name , password} = req.body ;
+        const email = req.params.email ;
+        if(!name|| !email || !password){
+            return res.status(400).json({
+                success:false,
+                message:"no details entered",
+            })
+        }
+
+        const query = `
+        UPDATE COLLEGE
+        SET name = $1 , password = $2
+        WHERE email = $3
+        `
+        const response = await client.query(query , [name, password , email]);
+
+        if(response.rowCount === 0){
+            return res.status(400).json({
+                success:false,
+                message:"no user found",
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"successfully update the user",
+        })
+
+    } catch (error) {
+        console.log(error.message);
+    }
 }
